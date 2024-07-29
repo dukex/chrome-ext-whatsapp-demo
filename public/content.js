@@ -46,7 +46,12 @@ window.addEventListener(
   false
 );
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  debugger;
-  console.log(request);
+chrome.runtime.onMessage.addListener(function (request, sender) {
+  window.postMessage(
+    JSON.stringify({
+      type: "request",
+      sender,
+      request,
+    })
+  );
 });

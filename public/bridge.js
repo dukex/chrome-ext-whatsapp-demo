@@ -23,14 +23,14 @@
       !(
         event.origin === "https://web.whatsapp.com" &&
         event.source === window &&
-        (data.response || (data.event && data.event.action))
+        data.type === "request"
       )
     ) {
       return;
     }
 
-    if (data.event.action) {
-      const { namespace, action, args } = data.event;
+    if (data.request.action) {
+      const { namespace, action, args } = data.request;
 
       WPP[namespace][action](...args);
     }

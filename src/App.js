@@ -4,7 +4,7 @@ import Chat from "./components/Chat";
 import useWhatsApp from "./hooks/useWhatsApp";
 
 function App() {
-  const { isReady } = useWhatsApp();
+  const { isReady, currentChat } = useWhatsApp();
 
   if (!isReady) {
     return <p>Loading...</p>;
@@ -14,7 +14,8 @@ function App() {
     <div className="App">
       <header className="App-header">
         <p>Ola mundo</p>
-        <Chat />
+
+        {currentChat && <Chat />}
       </header>
     </div>
   );

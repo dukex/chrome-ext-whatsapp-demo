@@ -3,16 +3,29 @@ import { createContext, useState, useEffect } from "react";
 
 const WhatsAppContext = createContext({
   isReady: false,
-  currentTab: null,
+  currentTabId: null,
   currentChat: null,
+  sentTextMessage: () => {},
 });
 
 export default WhatsAppContext;
 
 export function WhatsAppProvider({ children }) {
   const [isReady, setIsReady] = useState(false);
-  const [currentTab, setCurrentTab] = useState(null);
+  const [currentTabId, setCurrentTabId] = useState(null);
   const [currentChat, setCurrentChat] = useState(null);
+
+  const sentTextMessage = async (text, chatId) => {
+    if (!chatId) {
+      chatId = currentChat.id;
+    }
+
+    chrome.tabs.sendMessage(currentTabId, {
+      namespace: "chat",
+      action: "sendTextMessage",
+      args: [chatId, text, { createChat: true }],
+    });
+  };
 
   useEffect(() => {
     chrome.runtime.onMessage.addListener(function (
@@ -24,7 +37,7 @@ export function WhatsAppProvider({ children }) {
         return;
       }
 
-      setCurrentTab(sender.tab.id);
+      setCurrentTabId(sender.tab.id);
 
       if (request.type === "webpack.full_ready") {
         setIsReady(true);
@@ -49,7 +62,9 @@ export function WhatsAppProvider({ children }) {
   }, []);
 
   return (
-    <WhatsAppContext.Provider value={{ isReady, currentChat, currentTab }}>
+    <WhatsAppContext.Provider
+      value={{ isReady, currentChat, currentTabId, sentTextMessage }}
+    >
       {children}
     </WhatsAppContext.Provider>
   );
